@@ -8,7 +8,7 @@ El enlace principal es https://www.pisos.com y por un lado tenemos
 - venta
 - promociones: Obra nueva (En esta opcion se debe poner directamente - y localidad sin      especificar el tipo de construccion)
 Después de seleccionar una de las dos opciones en el enlace, podemos poner (seguido de - y localidad):
-- pisos: Casas y pisos
+- **pisos**: Casas y pisos
 - casas: Casas y chalets
 - piso: Pisos y apartamentos
 - aticos
@@ -16,16 +16,16 @@ Después de seleccionar una de las dos opciones en el enlace, podemos poner (seg
 - estudios
 - fincas_rusticas
 - lofts
-- locales: Locales y oficinas
+- **locales**: Locales y oficinas
 - local_comercial
 - almacen
 - oficinas
 - edificios
-- naves
+- **naves**
 - naves_industriales
 - naves_comerciales
-- terrenos
-- garajes: Garajes y trasteros
+- **terrenos**
+- **garajes**: Garajes y trasteros
 - trastero
 - garaje
 
@@ -59,9 +59,12 @@ Después de poner - y localidad (sin acentos y sin ñ) se puede poner en cualqui
 - m2-asc: Ordenados por m2 de superficie de forma ascendente
 
 Y al final de todo:
+- {numero}: Nº de página
 - ?keywords={palabra}
 
-Despues de introducir en la url las opciones especificadas anteriormente, el div de clase grid__wrapper tiene dentro divs de clase ad-preview, en los cuales al hacer click de redirige a https://www.pisos.com/{lo que aparece en data-lnk-href}
+Despues de introducir en la url las opciones especificadas anteriormente, el div de clase grid__wrapper tiene dentro divs de clase **ad-preview**, en los cuales al hacer click se redirige a https://www.pisos.com/{lo que aparece en data-lnk-href}
+
+En la página principal abajo del todo aparecen links de busqueda por provincia, cuya clase es **seo-box__location-link--level2**. De ahí podríamos ir recorriendo los diferentes items que hay y con sus href ir obteniendo los pisos de forma eficiente.
 
 ### CARACTERÍSTICAS DE PISOS
 * Superficie construída
@@ -74,3 +77,4 @@ Despues de introducir en la url las opciones especificadas anteriormente, el div
 * Conservación: [Reformado, En buen estado, A reformar] (No siempre aparece)
 * Gastos de Comunidad (No siempre aparece)
 * Referencia
+* Certificado energético (Consumo y Emisiones)
