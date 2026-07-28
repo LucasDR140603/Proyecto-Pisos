@@ -7,6 +7,7 @@ El enlace principal es https://www.pisos.com y por un lado tenemos
 - alquiler
 - venta
 - promociones: Obra nueva (En esta opcion se debe poner directamente - y localidad sin      especificar el tipo de construccion)
+
 Después de seleccionar una de las dos opciones en el enlace, podemos poner (seguido de - y localidad):
 - **pisos**: Casas y pisos
 - casas: Casas y chalets
@@ -64,7 +65,7 @@ Y al final de todo:
 
 Despues de introducir en la url las opciones especificadas anteriormente, el div de clase grid__wrapper tiene dentro divs de clase **ad-preview**, en los cuales al hacer click se redirige a https://www.pisos.com/{lo que aparece en data-lnk-href}
 
-En la página principal abajo del todo aparecen links de busqueda por provincia, cuya clase es **seo-box__location-link--level2**. De ahí podríamos ir recorriendo los diferentes items que hay y con sus href ir obteniendo los pisos de forma eficiente.
+En la página principal abajo del todo aparecen links de busqueda por municipio, cuya clase es **seo-box__location-link--level3**. De ahí podríamos ir recorriendo los diferentes items que hay y con sus href ir obteniendo los pisos de forma eficiente y precisa a la vez, ya que como máximo se pueden obtener 3000 pisos (30 en cada una de las 100 páginas como máximo) las provincias darían demasiados resultados a los que no se puede acceder.
 
 ### CARACTERÍSTICAS DE PISOS
 * Superficie construída
@@ -72,7 +73,7 @@ En la página principal abajo del todo aparecen links de busqueda por provincia,
 * Habitaciones
 * Baños
 * Planta
-* Interior o Exterior
+* Interior y/o Exterior
 * Antigüedad
 * Conservación: [Reformado, En buen estado, A reformar] (No siempre aparece)
 * Gastos de Comunidad (No siempre aparece)
