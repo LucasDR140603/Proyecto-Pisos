@@ -65,7 +65,7 @@ Y al final de todo:
 
 Despues de introducir en la url las opciones especificadas anteriormente, el div de clase grid__wrapper tiene dentro divs de clase **ad-preview**, en los cuales al hacer click se redirige a https://www.pisos.com/{lo que aparece en data-lnk-href}
 
-En la página principal abajo del todo aparecen links de busqueda por municipio, cuya clase es **seo-box__location-link--level3**. De ahí podríamos ir recorriendo los diferentes items que hay y con sus href ir obteniendo los pisos de forma eficiente y precisa a la vez, ya que como máximo se pueden obtener 3000 pisos (30 en cada una de las 100 páginas como máximo) las provincias darían demasiados resultados a los que no se puede acceder.
+En la página principal si se busca /viviendas/madrid abajo del todo aparecen links de busqueda por zona, cuya clase es **seo-box__location-link--level2**. De ahí podríamos ir recorriendo los diferentes items que hay y con sus href e ir sacando la url del botón de clase **button__primary** para ver todos los resultados si estos mismos no superan el nº de 3000, en caso de que sí sacamos los enlaces de /venta/... de los enlaces seo-box__location-link--level2 de abajo. De esta forma obtenemos las viviendas de Madrid de forma eficiente y precisa a la vez.
 
 ### CLASES DE VIVIENDA
     - apartamento,
