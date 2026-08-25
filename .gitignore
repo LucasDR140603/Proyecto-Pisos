@@ -2,3 +2,5 @@
 htmls
 details_htmls
 details_pkls
+.streamlit
+.env
