@@ -18,7 +18,7 @@ def buscar_localidad(x:str):
     return [op for op in localidades if x.lower() in op.lower()]
 if 'ip' not in st.session_state:
     try:
-        session=boto3.Session(aws_access_key_id=st.secrets["ACCESS_KEY"],aws_secret_access_key=st.secrets["SECRET_ACCESS_KEY"])
+        session=boto3.Session(aws_access_key_id=st.secrets["ACCESS_KEY"],aws_secret_access_key=st.secrets["SECRET_ACCESS_KEY"],region_name='eu-north-1')
         st.session_state['ip']=session.client('ec2').describe_instances(Filters=[{'Name':'tag:Name','Values':['ServerPisos']}])['Reservations'][0]['Instances'][0]['NetworkInterfaces'][0]['Association']['PublicIp']
     except KeyError:
         st.session_state['ip']='127.0.0.1'
