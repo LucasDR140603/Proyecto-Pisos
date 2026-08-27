@@ -12,6 +12,7 @@ import numpy as np
 import pandas as pd
 import re
 import requests
+import json
 st.set_page_config(
     page_title='PPVM',
     layout='wide'
@@ -26,7 +27,14 @@ def buscar_localidad(x:str):
     if not x:
         return []
     return [op for op in localidades if x.lower() in op.lower()]
+if 'ip' not in st.session_state:
+    try:
+        st.session_state['ip']=boto3.client('ec2').describe_instances(Filters=[{'Name':'tag:Name','Values':['ServerPisos']}])['Reservations'][0]['Instances'][0]['NetworkInterfaces'][0]['Association']['PublicIp']
+    except KeyError:
+        st.session_state['ip']='127.0.0.1'
 with tab1:
+    if 'prediccion' not in st.session_state:
+        st.session_state['prediccion']=''
     superficie_construida:float=st.number_input("Superficie construida (m²)",min_value=1.0,step=1.0)
     banhos:int=st.slider("Baños",min_value=0,step=1)
     habitaciones:int=st.slider("Habitaciones",min_value=1,step=1)
@@ -35,8 +43,29 @@ with tab1:
     conservacion:str=st.selectbox("Conservacion",options=conservaciones)
     localidad:str=st.selectbox("Localidad",options=localidades)
     if st.button('Predecir Precio'):
-        print(len(localidades))
-        response:requests.Response=requests.post(url='http://51.20.255.43:8000/predict/',json=dict(superficie_construida=superficie_construida,banhos=banhos,habitaciones=habitaciones,consumo=consumo,emisiones=emisiones,conservacion=conservacion,localidad=localidad))
-        st.write(f"{float(response.text):.0f} €")
+        response:requests.Response=requests.post(url=f'http://{st.session_state['ip']}:8000/predict/',json=dict(superficie_construida=superficie_construida,banhos=banhos,habitaciones=habitaciones,consumo=consumo,emisiones=emisiones,conservacion=conservacion,localidad=localidad))
+        st.session_state['prediccion']=f"{float(response.text):.0f} €"
+    st.write(st.session_state['prediccion'])
 with tab2:
-    st.write('b')
+    if 'historial' not in st.session_state:
+        st.session_state['historial']=[]
+        st.session_state['historial_consultas']=[]
+    if request:=st.chat_input():
+        with st.chat_message('ai'):
+            def stream():
+                fin=False
+                historial_contador=0
+                with requests.post(url=f'http://{st.session_state['ip']}:8000/ask/',json=dict(request=request,historial=st.session_state['historial'],historial_consultas=st.session_state['historial_consultas']),stream=True) as response:
+                    for chunk in response.iter_content(chunk_size=None,decode_unicode=True):
+                        if chunk:
+                            if chunk=='FIN_DE_LA_RESPUESTA':
+                                fin=True
+                            elif fin:
+                                chunk_json=json.loads(str(chunk).format(request=request))
+                                chunk_json=[[x.replace('{','{{').replace('}','}}') for x in lista] for lista in chunk_json]
+                                historial_a_extender='historial' if historial_contador==0 else 'historial_consultas'
+                                st.session_state[historial_a_extender].extend(chunk_json)
+                                historial_contador+=1
+                            else:
+                                yield chunk
+            st.write_stream(stream())
