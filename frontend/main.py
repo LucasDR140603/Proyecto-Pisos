@@ -28,34 +28,43 @@ with tab1:
     superficie_construida:float=st.number_input("Superficie construida (m²)",min_value=1.0,step=1.0)
     banhos:int=st.slider("Baños",min_value=0,step=1)
     habitaciones:int=st.slider("Habitaciones",min_value=1,step=1)
-    consumo:float=st.number_input("Consumo kWh/m² año",min_value=0,step=1)
-    emisiones:float=st.number_input("Emisiones Kg CO₂/m² año",min_value=0,step=1)
+    consumo=None
+    emisiones=None
+    if st.checkbox('Consumo y Emisiones'):
+        consumo=st.number_input("Consumo kWh/m² año",min_value=0,step=1)
+        emisiones=st.number_input("Emisiones Kg CO₂/m² año",min_value=0,step=1)
     conservacion:str=st.selectbox("Conservacion",options=conservaciones)
     localidad:str=st.selectbox("Localidad",options=localidades)
     if st.button('Predecir Precio'):
         response:requests.Response=requests.post(url=f'http://{st.session_state['ip']}:8000/predict/',json=dict(superficie_construida=superficie_construida,banhos=banhos,habitaciones=habitaciones,consumo=consumo,emisiones=emisiones,conservacion=conservacion,localidad=localidad))
-        st.session_state['prediccion']=f"{float(response.text):.0f} €"
+        numero=float(response.text)
+        if numero<0:
+            numero=0
+        st.session_state['prediccion']=f"{numero:.0f} €"
     st.write(st.session_state['prediccion'])
 with tab2:
     if 'historial' not in st.session_state:
         st.session_state['historial']=[]
         st.session_state['historial_consultas']=[]
+    contenedor=st.container()
+    for mensaje in st.session_state['historial']:
+        contenedor.chat_message(mensaje[0]).write(mensaje[1])
     if request:=st.chat_input():
-        with st.chat_message('ai'):
-            def stream():
-                fin=False
-                historial_contador=0
-                with requests.post(url=f'http://{st.session_state['ip']}:8000/ask/',json=dict(request=request,historial=st.session_state['historial'],historial_consultas=st.session_state['historial_consultas']),stream=True) as response:
-                    for chunk in response.iter_content(chunk_size=None,decode_unicode=True):
-                        if chunk:
-                            if chunk=='FIN_DE_LA_RESPUESTA':
-                                fin=True
-                            elif fin:
-                                chunk_json=json.loads(str(chunk).format(request=request))
-                                chunk_json=[[x.replace('{','{{').replace('}','}}') for x in lista] for lista in chunk_json]
-                                historial_a_extender='historial' if historial_contador==0 else 'historial_consultas'
-                                st.session_state[historial_a_extender].extend(chunk_json)
-                                historial_contador+=1
-                            else:
-                                yield chunk
-            st.write_stream(stream())
+        contenedor.chat_message('human').write(request)
+        def stream():
+            fin=False
+            historial_contador=0
+            with requests.post(url=f'http://{st.session_state['ip']}:8000/ask/',json=dict(request=request,historial=st.session_state['historial'],historial_consultas=st.session_state['historial_consultas']),stream=True) as response:
+                for chunk in response.iter_content(chunk_size=None,decode_unicode=True):
+                    if chunk:
+                        if chunk=='FIN_DE_LA_RESPUESTA':
+                            fin=True
+                        elif fin:
+                            chunk_json=json.loads(str(chunk).format(request=request))
+                            chunk_json=[[x.replace('{','{{').replace('}','}}') for x in lista] for lista in chunk_json]
+                            historial_a_extender='historial' if historial_contador==0 else 'historial_consultas'
+                            st.session_state[historial_a_extender].extend(chunk_json)
+                            historial_contador+=1
+                        else:
+                            yield chunk
+        contenedor.chat_message('ai').write_stream(stream())
