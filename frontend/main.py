@@ -4,6 +4,7 @@ import streamlit as st
 import boto3
 import requests
 import json
+from typing import Any
 st.set_page_config(
     page_title='PPVM',
     layout='wide',
@@ -27,8 +28,6 @@ if 'ip' not in st.session_state:
         st.session_state['ip']='127.0.0.1'
 with tab1:
     col1,col2=st.columns(2)
-    if 'prediccion' not in st.session_state:
-        st.session_state['prediccion']=''
     with col1:
         superficie_construida:int=st.number_input("Superficie construida (m²)",min_value=16,step=1,max_value=350)
         b,h=st.columns(2)
@@ -46,13 +45,15 @@ with tab1:
     with col2:
         with st.container(gap='xxsmall',horizontal_alignment='center'):
             if st.button('Predecir Precio',type='primary'):
-                response:requests.Response=requests.post(url=f'http://{st.session_state['ip']}:8000/predict/',json=dict(superficie_construida=superficie_construida,banhos=banhos,habitaciones=habitaciones,consumo=consumo,emisiones=emisiones,conservacion=conservacion,localidad=localidad_formateada))
-                numero=float(response.text)
-                if numero<0:
-                    numero=0
-                numero_str=f"{numero:.0f}"
-                st.session_state['prediccion']=f"{'.'.join(numero_str[::-1][i:i+3] for i in range(0,len(numero_str),3))[::-1]} €"
-            st.title(st.session_state['prediccion'],width='content',anchor=False)
+                response:dict[str,Any]=json.loads(requests.post(url=f'http://{st.session_state['ip']}:8000/predict/',json=dict(superficie_construida=superficie_construida,banhos=banhos,habitaciones=habitaciones,consumo=consumo,emisiones=emisiones,conservacion=conservacion,localidad=localidad_formateada)).text)
+                p=str(response['precio'])
+                response['precio']=f"{'.'.join(p[::-1][i:i+3] for i in range(0,len(p),3))[::-1]} €"
+                st.session_state['prediccion']=response
+            if 'prediccion' in st.session_state:
+                st.title(st.session_state['prediccion'].get('precio'),width='content',anchor=False)
+                with st.container(gap='xxsmall',horizontal_alignment='left'):
+                    for add in st.session_state['prediccion'].get('anuncios'):
+                        st.write(add)
 with tab2:
     if 'historial' not in st.session_state:
         st.session_state['historial']=[]
