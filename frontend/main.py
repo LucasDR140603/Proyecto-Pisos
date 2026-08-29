@@ -52,8 +52,9 @@ with tab1:
             if 'prediccion' in st.session_state:
                 st.title(st.session_state['prediccion'].get('precio'),width='content',anchor=False)
                 with st.container(gap='xxsmall',horizontal_alignment='left'):
+                    st.subheader('Anuncios más parecidos')
                     for add in st.session_state['prediccion'].get('anuncios'):
-                        st.write(add)
+                        st.write(f"- {add}")
 with tab2:
     if 'historial' not in st.session_state:
         st.session_state['historial']=[]
